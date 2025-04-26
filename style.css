@@ -1,44 +1,232 @@
-body.light-theme {
-  background-color: #f8f9fa;
-  color: #212529;
+/* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-body.dark-theme {
-  background-color: #212529;
-  color: #f8f9fa;
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  transition: background-color 0.5s, color 0.5s;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
 }
 
-.card {
-  border-radius: 1rem;
+/* Light Theme */
+:root {
+  --bg: #ffffff;
+  --text: #222222;
+  --card: #f5f5f5;
+  --primary: #4f46e5;
+  --success: #22c55e;
+  --danger: #ef4444;
 }
 
-.progress {
+/* Dark Theme */
+body.dark {
+  --bg: #121212;
+  --text: #e0e0e0;
+  --card: #1e1e1e;
+  --primary: #818cf8;
+  --success: #4ade80;
+  --danger: #f87171;
+}
+
+.container {
+  width: 100%;
+  max-width: 800px;
+  background-color: var(--card);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  margin-top: 20px;
+}
+
+/* Header */
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#theme-toggle {
+  background-color: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+#theme-toggle:hover {
+  background-color: #6366f1;
+}
+
+/* Timer Progress Bar */
+#timer {
+  width: 100%;
+  background: var(--bg);
+  border-radius: 50px;
+  overflow: hidden;
+  margin: 20px 0;
   height: 20px;
-  background-color: #e9ecef;
+  box-shadow: inset 0 0 5px var(--primary);
 }
 
-#timerText {
-  font-size: 0.9rem;
+#timer-inner {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--success));
+  animation: shrinkTimer linear forwards;
 }
 
-.btn {
-  border-radius: 30px;
-  padding: 10px 20px;
+@keyframes shrinkTimer {
+  from { width: 100%; }
+  to { width: 0%; }
 }
 
-#quizContainer {
-  min-height: 150px;
+/* Questions */
+#question {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
 }
 
-#resultContainer {
-  text-align: center;
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
+.option {
+  padding: 10px 15px;
+  border: 2px solid var(--primary);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.option:hover {
+  background-color: var(--primary);
+  color: #fff;
+  transform: scale(1.02);
+}
+
+/* Green Red after submission */
 .correct {
-  background-color: #d4edda;
+  background-color: var(--success);
+  color: #fff;
 }
 
 .incorrect {
-  background-color: #f8d7da;
+  background-color: var(--danger);
+  color: #fff;
 }
 
+/* Buttons */
+.button-container {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+button {
+  background-color: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #6366f1;
+}
+
+/* Review */
+#review-section {
+  margin-top: 30px;
+}
+
+.review-question {
+  margin: 10px 0;
+}
+
+.review-correct {
+  color: var(--success);
+  font-weight: bold;
+}
+
+.review-incorrect {
+  color: var(--danger);
+  font-weight: bold;
+}
+
+/* Submit Confirmation */
+#submit-confirm {
+  margin-top: 20px;
+}
+
+/* Leaderboard */
+#leaderboard-section {
+  margin-top: 30px;
+}
+
+#leaderboard {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+#leaderboard th, #leaderboard td {
+  border: 1px solid var(--primary);
+  padding: 10px;
+  text-align: center;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Success Alert */
+.success-alert {
+  padding: 20px;
+  background-color: var(--success);
+  color: #fff;
+  font-size: 1.2rem;
+  border-radius: 12px;
+  margin: 20px 0;
+  animation: popIn 0.5s ease forwards;
+  text-align: center;
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Footer */
+footer {
+  margin-top: auto;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--primary);
+  margin-top: 40px;
+  }
+  
