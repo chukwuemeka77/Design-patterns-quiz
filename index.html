@@ -2,232 +2,192 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Singleton Pattern Quiz - Leaderboard Version</title>
+  <title>Random Quiz App</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 30px;
-    }
-    #timer {
-      font-size: 20px;
-      font-weight: bold;
-      margin-bottom: 20px;
-      color: red;
-    }
-    .question {
-      display: none;
-    }
-    .question.active {
-      display: block;
-    }
-    button {
-      margin: 5px;
-    }
-    .correct {
-      color: green;
-    }
-    .wrong {
-      color: red;
-    }
-    .explanation {
-      margin-top: 10px;
-      font-size: 16px;
-    }
-    #leaderboard {
-      margin-top: 30px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    th, td {
-      border: 1px solid black;
-      padding: 8px;
-      text-align: center;
-    }
-    th {
-      background-color: #eee;
-    }
+    .correct { background-color: #d4edda; }
+    .wrong { background-color: #f8d7da; }
+    #leaderboard-section { display: none; }
   </style>
 </head>
-<body>
+<body class="bg-light">
 
-  <h1>Singleton Pattern Quiz (Leaderboard Version)</h1>
+<div class="container py-5">
+  <h1 class="text-center mb-4">Quiz App</h1>
 
-  <div id="timer">Time Left: 60 seconds</div>
-
-  <form id="quizForm">
-    <div id="nameDiv">
-      <p><strong>Enter your name:</strong></p>
-      <input type="text" id="username" placeholder="Your Name" required>
-      <br><br>
-      <button type="button" onclick="startQuiz()">Start Quiz</button>
+  <div id="quiz-section" class="card shadow-sm p-4">
+    <div id="timer" class="mb-3 text-end fw-bold text-danger">15:00</div>
+    <div id="question-container"></div>
+    <div class="mt-4 text-center">
+      <button id="next-btn" class="btn btn-primary">Next</button>
+      <button id="submit-btn" class="btn btn-success d-none">Submit Quiz</button>
     </div>
+  </div>
 
-    <div id="questionsContainer"></div>
-
-    <div id="result" style="display:none;">
-      <h3>Your Results:</h3>
-      <p id="score"></p>
-      <p id="percentage"></p>
-      <div id="explanations"></div>
-      <button type="button" onclick="restartQuiz()">Restart Quiz</button>
+  <div id="result-section" class="card shadow-sm p-4 mt-5 d-none">
+    <h2 class="text-center mb-3">Result</h2>
+    <p id="score" class="text-center fs-5 fw-bold"></p>
+    <div id="review-container" class="mt-4"></div>
+    <div class="text-center mt-4">
+      <button onclick="restartQuiz()" class="btn btn-secondary">Restart Quiz</button>
+      <button onclick="showLeaderboard()" class="btn btn-info">View Leaderboard</button>
     </div>
-  </form>
+  </div>
 
-  <h2 id="leaderboardTitle">Leaderboard</h2>
-  <div id="leaderboard">
-    <table>
+  <div id="leaderboard-section" class="card shadow-sm p-4 mt-5">
+    <h2 class="text-center mb-3">Leaderboard</h2>
+    <table class="table table-striped">
       <thead>
         <tr>
-          <th>Name</th>
+          <th>Rank</th>
           <th>Score</th>
           <th>Percentage</th>
+          <th>Date</th>
         </tr>
       </thead>
-      <tbody id="leaderboardBody"></tbody>
+      <tbody id="leaderboard-body"></tbody>
     </table>
   </div>
 
-  <script>
-    var currentQuestion = 1;
-    var totalQuestions = 5;
-    var timeLeft = 60;
-    var timer;
-    var username = "";
-    var selectedAnswers = {};
-    var allQuestions = [
-      { question: "What does the Singleton pattern ensure?", options: ['Multiple objects exist', 'Only one object exists', 'No objects are created'], answer: 'b', explanation: 'Singleton ensures only one object exists.' },
-      { question: "How do we access the Singleton object?", options: ['By calling `new` many times', 'By using a static method like `getInstance()`', 'By copying it'], answer: 'b', explanation: 'We access it by a static method like getInstance().' },
-      { question: "Why is the constructor private in Singleton?", options: ['To allow easy creation', 'To prevent creating multiple instances', 'To make the code faster'], answer: 'b', explanation: 'Private constructor prevents outside code from making new objects.' },
-      { question: "Which real-world example fits the Singleton pattern?", options: ['Multiple drivers in a taxi app', 'Only one President of a country', 'Many users of a website'], answer: 'b', explanation: 'Only one President at a time is a good Singleton example!' },
-      { question: "What happens if we forget to make the constructor private?", options: ['Nothing will happen', 'Many objects could be created by mistake', 'Program becomes faster'], answer: 'b', explanation: 'If constructor is public, multiple instances could be made by mistake!' },
-      { question: "What is the primary reason to use Singleton?", options: ['To share global state', 'To ensure resource consistency', 'To create multiple objects'], answer: 'b', explanation: 'Singleton ensures that only one instance of the object exists, providing consistency and controlling shared resources.' },
-      { question: "Which pattern restricts object creation to one instance?", options: ['Factory', 'Singleton', 'Abstract Factory'], answer: 'b', explanation: 'The Singleton pattern ensures that only one instance of a class exists.' },
-      { question: "What happens when you try to create another instance of a Singleton object?", options: ['It throws an exception', 'It creates another object', 'It returns the existing object'], answer: 'c', explanation: 'The Singleton pattern ensures only one instance exists, and repeated calls return the same instance.' },
-      { question: "In which scenario should Singleton pattern be used?", options: ['To create new objects', 'When you need to share state across the application', 'To save memory'], answer: 'b', explanation: 'The Singleton pattern is perfect when you need a single shared instance across the application.' },
-      { question: "What is the main benefit of using the Singleton pattern?", options: ['It saves memory by creating multiple instances', 'It allows the object to be shared throughout the application', 'It makes the application more complex'], answer: 'b', explanation: 'Singleton pattern ensures only one instance, making it easier to share data across the application.' },
-      { question: "What method is typically used to access the Singleton object?", options: ['new', 'getInstance()', 'createObject()'], answer: 'b', explanation: 'getInstance() is the standard method to access the Singleton instance.' },
-      { question: "Why do we need Singleton if we already have static classes?", options: ['Static classes are the same as Singleton', 'Singleton allows more flexibility with instance creation', 'We can’t instantiate static classes'], answer: 'b', explanation: 'Singleton gives more control over instance creation and state management.' },
-      { question: "Which design principle is important for Singleton?", options: ['Encapsulation', 'Inheritance', 'Abstraction'], answer: 'a', explanation: 'Encapsulation allows the class to control the instance creation and limit outside access.' },
-      { question: "Which is a disadvantage of the Singleton pattern?", options: ['It reduces code complexity', 'It makes unit testing harder', 'It requires more memory'], answer: 'b', explanation: 'Singleton can make testing more difficult, as it creates global state.' },
-      { question: "What is a possible problem when using Singleton?", options: ['Too many instances are created', 'State is shared across the application', 'It can be instantiated multiple times'], answer: 'b', explanation: 'Singleton objects share state, which can cause issues in multithreaded applications.' },
-      { question: "Which of the following is a real-world example of a Singleton?", options: ['A traffic light', 'A user session', 'A website login'], answer: 'a', explanation: 'A traffic light is a good example of a Singleton, as only one exists at a time.' }
-    ];
+</div>
 
-    function updateTimer() {
-      document.getElementById('timer').innerText = `Time Left: ${timeLeft} seconds`;
-      if (timeLeft <= 0) {
-        clearInterval(timer);
-        alert("Time's up! Submitting your quiz...");
-        submitQuiz();
-      }
-      timeLeft--;
-    }
+<script>
+// 15 question database
+const allQuestions = [
+  { question: "What is the capital of France?", options: ["Paris", "Rome", "Berlin", "London"], answer: "Paris" },
+  { question: "HTML stands for?", options: ["HyperText Markup Language", "Home Tool Markup Language", "Hyperlinks and Text Markup Language", "None"], answer: "HyperText Markup Language" },
+  { question: "CSS stands for?", options: ["Colorful Style Sheets", "Cascading Style Sheets", "Computer Style Sheets", "Creative Style Sheets"], answer: "Cascading Style Sheets" },
+  { question: "JS stands for?", options: ["Java Style", "JavaScript", "JustScript", "JollyScript"], answer: "JavaScript" },
+  { question: "Which is not a JavaScript Framework?", options: ["Python Script", "JQuery", "Django", "NodeJS"], answer: "Django" },
+  { question: "Which language runs in a web browser?", options: ["Java", "C", "Python", "JavaScript"], answer: "JavaScript" },
+  { question: "What does DOM stand for?", options: ["Document Object Model", "Display Object Management", "Digital Ordinance Model", "Desktop Oriented Mode"], answer: "Document Object Model" },
+  { question: "What year was JavaScript launched?", options: ["1996", "1995", "1994", "none of the above"], answer: "1995" },
+  { question: "Bootstrap is mainly used for?", options: ["Database", "Design", "Server side scripting", "Machine learning"], answer: "Design" },
+  { question: "Which tag is used for paragraphs in HTML?", options: ["<p>", "<div>", "<section>", "<span>"], answer: "<p>" },
+  { question: "Which tag is used to link CSS?", options: ["<link>", "<script>", "<style>", "<meta>"], answer: "<link>" },
+  { question: "Which CSS property changes text color?", options: ["text-color", "color", "font-color", "background-color"], answer: "color" },
+  { question: "How do you create a function in JS?", options: ["function = myFunction()", "function myFunction()", "function:myFunction()", "def myFunction()"], answer: "function myFunction()" },
+  { question: "Which operator is used to assign a value?", options: ["=", "-", "*", "+"], answer: "=" },
+  { question: "Which keyword declare variables in JS?", options: ["var", "let", "const", "All of the above"], answer: "All of the above" }
+];
 
-    function startTimer() {
-      timer = setInterval(updateTimer, 1000);
-    }
+let questions = [];
+let currentQuestionIndex = 0;
+let score = 0;
+let timer;
+let timeLeft = 900; // 15 minutes in seconds
 
-    function startQuiz() {
-      username = document.getElementById('username').value.trim();
-      if (username === "") {
-        alert("Please enter your name first!");
-        return;
-      }
-      document.getElementById('nameDiv').style.display = "none";
-      document.getElementById('leaderboardTitle').style.display = "none";
-      showQuestions();
-      startTimer();
-    }
+function startQuiz() {
+  questions = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, 5);
+  currentQuestionIndex = 0;
+  score = 0;
+  document.getElementById('quiz-section').classList.remove('d-none');
+  document.getElementById('result-section').classList.add('d-none');
+  document.getElementById('leaderboard-section').style.display = 'none';
+  showQuestion();
+  startTimer();
+}
 
-    function getRandomQuestions() {
-      let randomQuestions = [];
-      let randomIndexes = [];
-      while (randomQuestions.length < totalQuestions) {
-        let index = Math.floor(Math.random() * allQuestions.length);
-        if (!randomIndexes.includes(index)) {
-          randomQuestions.push(allQuestions[index]);
-          randomIndexes.push(index);
-        }
-      }
-      return randomQuestions;
-    }
+function showQuestion() {
+  const question = questions[currentQuestionIndex];
+  const container = document.getElementById('question-container');
+  container.innerHTML = `
+    <h4>${currentQuestionIndex + 1}. ${question.question}</h4>
+    ${question.options.map(opt => `
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="option" value="${opt}" id="${opt}">
+        <label class="form-check-label" for="${opt}">${opt}</label>
+      </div>
+    `).join('')}
+  `;
+}
 
-    function showQuestions() {
-      const questionsContainer = document.getElementById('questionsContainer');
-      const questions = getRandomQuestions();
-      questionsContainer.innerHTML = "";
-      questions.forEach((q, index) => {
-        const questionHtml = `
-          <div class="question" id="q${index + 1}">
-            <p><strong>${q.question}</strong></p>
-            ${q.options.map((opt, i) => `
-              <input type="radio" name="q${index + 1}" value="${String.fromCharCode(97 + i)}"> (${String.fromCharCode(97 + i)}) ${opt} <br>
-            `).join('')}
-          </div>
-        `;
-        questionsContainer.innerHTML += questionHtml;
-      });
-      document.getElementById('q1').classList.add('active');
-    }
+document.getElementById('next-btn').addEventListener('click', () => {
+  const selected = document.querySelector('input[name="option"]:checked');
+  if (!selected) {
+    alert('Please select an answer!');
+    return;
+  }
+  if (selected.value === questions[currentQuestionIndex].answer) {
+    score++;
+  }
+  currentQuestionIndex++;
+  if (currentQuestionIndex < questions.length) {
+    showQuestion();
+  } else {
+    document.getElementById('next-btn').classList.add('d-none');
+    document.getElementById('submit-btn').classList.remove('d-none');
+  }
+});
 
-    function submitQuiz() {
+document.getElementById('submit-btn').addEventListener('click', finishQuiz);
+
+function finishQuiz() {
+  clearInterval(timer);
+  document.getElementById('quiz-section').classList.add('d-none');
+  document.getElementById('result-section').classList.remove('d-none');
+  const percentage = ((score / questions.length) * 100).toFixed(2);
+  document.getElementById('score').innerText = `You scored ${score}/${questions.length} (${percentage}%)`;
+  showReview();
+  updateLeaderboard(score, percentage);
+}
+
+function showReview() {
+  const review = questions.map((q, index) => {
+    const isCorrect = document.querySelector(`input[name="option"]:checked[value="${q.answer}"]`) !== null;
+    return `
+      <div class="p-2 mb-2 ${isCorrect ? 'correct' : 'wrong'} rounded">
+        <strong>Q${index + 1}:</strong> ${q.question}<br>
+        <small>Correct Answer: <u>${q.answer}</u></small>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('review-container').innerHTML = review;
+}
+
+function restartQuiz() {
+  document.getElementById('next-btn').classList.remove('d-none');
+  document.getElementById('submit-btn').classList.add('d-none');
+  startQuiz();
+}
+
+function startTimer() {
+  timer = setInterval(() => {
+    timeLeft--;
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    document.getElementById('timer').innerText = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    if (timeLeft <= 0) {
       clearInterval(timer);
-      let score = 0;
-      let correctAnswers = [];
-      let totalAnswers = [];
-      allQuestions.forEach((q, index) => {
-        const selectedOption = document.querySelector(`input[name="q${index + 1}"]:checked`);
-        if (selectedOption) {
-          const answer = selectedOption.value;
-          totalAnswers.push(answer);
-          if (answer === q.answer) {
-            score++;
-            correctAnswers.push(`Question ${index + 1}: Correct`);
-          }
-        }
-      });
-
-      const percentage = Math.round((score / totalQuestions) * 100);
-      document.getElementById('score').innerText = `Your Score: ${score}/${totalQuestions}`;
-      document.getElementById('percentage').innerText = `Percentage: ${percentage}%`;
-
-      const explanationsDiv = document.getElementById('explanations');
-      explanationsDiv.innerHTML = correctAnswers.join('<br>');
-
-      document.getElementById('result').style.display = "block";
-      updateLeaderboard(username, score, percentage);
+      finishQuiz();
     }
+  }, 1000);
+}
 
-    function restartQuiz() {
-      document.getElementById('result').style.display = "none";
-      timeLeft = 60;
-      document.getElementById('timer').innerText = `Time Left: ${timeLeft} seconds`;
-      startQuiz();
-    }
+function updateLeaderboard(score, percentage) {
+  const leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+  leaderboard.push({ score, percentage, date: new Date().toLocaleString() });
+  leaderboard.sort((a, b) => b.score - a.score);
+  localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+}
 
-    function updateLeaderboard(name, score, percentage) {
-      const leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
-      leaderboard.push({ name, score, percentage });
-      leaderboard.sort((a, b) => b.score - a.score);
+function showLeaderboard() {
+  const leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+  const body = leaderboard.map((entry, index) => `
+    <tr>
+      <td>${index + 1}</td>
+      <td>${entry.score}</td>
+      <td>${entry.percentage}%</td>
+      <td>${entry.date}</td>
+    </tr>
+  `).join('');
+  document.getElementById('leaderboard-body').innerHTML = body;
+  document.getElementById('leaderboard-section').style.display = 'block';
+}
 
-      localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
-      renderLeaderboard();
-    }
+// Start quiz when page loads
+startQuiz();
+</script>
 
-    function renderLeaderboard() {
-      const leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
-      const leaderboardBody = document.getElementById('leaderboardBody');
-      leaderboardBody.innerHTML = "";
-      leaderboard.forEach(entry => {
-        const row = `<tr><td>${entry.name}</td><td>${entry.score}</td><td>${entry.percentage}%</td></tr>`;
-        leaderboardBody.innerHTML += row;
-      });
-    }
-
-    renderLeaderboard();
-  </script>
 </body>
-        </html>
-  
+</html>
