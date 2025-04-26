@@ -2,54 +2,36 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OOP & Design Patterns Quiz</title>
+  <title>Quiz App</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="theme-toggle">
-  <label class="switch">
-    <input type="checkbox" id="themeSwitcher">
-    <span class="slider"></span>
-  </label>
-</div>
 
-<div class="quiz-container" id="quizContainer">
-  <h1>OOP & Design Patterns Quiz</h1>
-  <div class="timer">
-    <div id="timerBar"></div>
-    <div id="timerText">15:00</div>
+<div class="container" id="quiz-container">
+  <h1>Quiz Time!</h1>
+
+  <button id="theme-toggle">Toggle Theme</button>
+
+  <div id="timer">
+    <div id="timer-inner"></div>
   </div>
-  <div id="quizContent"></div>
-  <div class="controls">
-    <button id="nextButton">Next</button>
-    <button id="submitButton" style="display:none">Submit</button>
+
+  <div id="question" class="question"></div>
+  <div id="options" class="options"></div>
+
+  <div class="buttons" id="submit-confirm">
+    <button id="submit-btn">Submit Quiz</button>
   </div>
-  <div id="confirmSubmit" style="display:none">
-    <input type="checkbox" id="confirmBox"> I confirm I want to submit my answers.
+
+  <div id="success-alert" class="success-alert hidden">Quiz Completed!</div>
+
+  <div id="review-section"></div>
+
+  <div id="leaderboard-section" class="hidden">
+    <h2>Leaderboard</h2>
+    <table id="leaderboard"></table>
   </div>
-</div>
 
-<div class="result-container" id="resultContainer" style="display:none">
-  <h2>Quiz Complete!</h2>
-  <p id="finalScore"></p>
-  <button id="reviewButton">Review Answers</button>
-  <button id="retakeButton">Retake Quiz</button>
-</div>
-
-<div id="reviewContainer" style="display:none">
-  <h2>Review Your Answers</h2>
-  <div id="reviewContent"></div>
-</div>
-
-<div id="leaderboardContainer" style="display:none">
-  <h2>Leaderboard</h2>
-  <table id="leaderboardTable">
-    <thead>
-      <tr><th>Name</th><th>Score (%)</th></tr>
-    </thead>
-    <tbody></tbody>
-  </table>
 </div>
 
 <script src="script.js"></script>
