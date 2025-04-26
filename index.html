@@ -2,193 +2,245 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Random Quiz App</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>OOP & Design Patterns Quiz</title>
   <style>
-    .correct { background-color: #d4edda; }
-    .wrong { background-color: #f8d7da; }
-    #leaderboard-section { display: none; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+    }
+    #timer {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: red;
+    }
+    .question {
+      display: none;
+    }
+    .question.active {
+      display: block;
+    }
+    button {
+      margin: 5px;
+    }
+    .correct {
+      color: green;
+    }
+    .wrong {
+      color: red;
+    }
+    .explanation {
+      margin-top: 10px;
+      font-size: 16px;
+    }
+    #leaderboard {
+      margin-top: 30px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #eee;
+    }
   </style>
 </head>
-<body class="bg-light">
+<body>
 
-<div class="container py-5">
-  <h1 class="text-center mb-4">Quiz App</h1>
+  <h1>OOP & Design Patterns Quiz</h1>
 
-  <div id="quiz-section" class="card shadow-sm p-4">
-    <div id="timer" class="mb-3 text-end fw-bold text-danger">15:00</div>
-    <div id="question-container"></div>
-    <div class="mt-4 text-center">
-      <button id="next-btn" class="btn btn-primary">Next</button>
-      <button id="submit-btn" class="btn btn-success d-none">Submit Quiz</button>
+  <div id="timer">Time Left: 15 minutes</div>
+
+  <form id="quizForm">
+    <div id="nameDiv">
+      <p><strong>Enter your name:</strong></p>
+      <input type="text" id="username" placeholder="Your Name" required>
+      <br><br>
+      <button type="button" onclick="startQuiz()">Start Quiz</button>
     </div>
-  </div>
 
-  <div id="result-section" class="card shadow-sm p-4 mt-5 d-none">
-    <h2 class="text-center mb-3">Result</h2>
-    <p id="score" class="text-center fs-5 fw-bold"></p>
-    <div id="review-container" class="mt-4"></div>
-    <div class="text-center mt-4">
-      <button onclick="restartQuiz()" class="btn btn-secondary">Restart Quiz</button>
-      <button onclick="showLeaderboard()" class="btn btn-info">View Leaderboard</button>
+    <div class="question" id="q1">
+      <p><strong>1. What does the Singleton pattern ensure?</strong></p>
+      <input type="radio" name="q1" value="a"> (a) Multiple objects exist<br>
+      <input type="radio" name="q1" value="b"> (b) Only one object exists<br>
+      <input type="radio" name="q1" value="c"> (c) No objects are created<br>
+      <br>
+      <button type="button" onclick="lockAnswer()">Submit Answer</button>
     </div>
-  </div>
 
-  <div id="leaderboard-section" class="card shadow-sm p-4 mt-5">
-    <h2 class="text-center mb-3">Leaderboard</h2>
-    <table class="table table-striped">
+    <div class="question" id="q2">
+      <p><strong>2. How do we access the Singleton object?</strong></p>
+      <input type="radio" name="q2" value="a"> (a) By calling `new` many times<br>
+      <input type="radio" name="q2" value="b"> (b) By using a static method like `getInstance()`<br>
+      <input type="radio" name="q2" value="c"> (c) By copying it<br>
+      <br>
+      <button type="button" onclick="lockAnswer()">Submit Answer</button>
+    </div>
+
+    <div class="question" id="q3">
+      <p><strong>3. Why is the constructor private in Singleton?</strong></p>
+      <input type="radio" name="q3" value="a"> (a) To allow easy creation<br>
+      <input type="radio" name="q3" value="b"> (b) To prevent creating multiple instances<br>
+      <input type="radio" name="q3" value="c"> (c) To make the code faster<br>
+      <br>
+      <button type="button" onclick="lockAnswer()">Submit Answer</button>
+    </div>
+
+    <div class="question" id="q4">
+      <p><strong>4. What is a core feature of Object-Oriented Programming (OOP)?</strong></p>
+      <input type="radio" name="q4" value="a"> (a) Reusability<br>
+      <input type="radio" name="q4" value="b"> (b) Speed<br>
+      <input type="radio" name="q4" value="c"> (c) Text-based interface<br>
+      <br>
+      <button type="button" onclick="lockAnswer()">Submit Answer</button>
+    </div>
+
+    <div class="question" id="q5">
+      <p><strong>5. What is the primary purpose of the Factory Method pattern?</strong></p>
+      <input type="radio" name="q5" value="a"> (a) To create a single instance of a class<br>
+      <input type="radio" name="q5" value="b"> (b) To abstract object creation logic<br>
+      <input type="radio" name="q5" value="c"> (c) To store objects<br>
+      <br>
+      <button type="button" onclick="lockAnswer()">Submit Answer</button>
+    </div>
+  </form>
+
+  <h2 id="score"></h2>
+  <div id="explanations"></div>
+
+  <div id="leaderboard" style="display: none;">
+    <h2>Leaderboard</h2>
+    <table>
       <thead>
         <tr>
-          <th>Rank</th>
+          <th>Name</th>
           <th>Score</th>
           <th>Percentage</th>
-          <th>Date</th>
         </tr>
       </thead>
-      <tbody id="leaderboard-body"></tbody>
+      <tbody id="leaderboardBody"></tbody>
     </table>
   </div>
 
-</div>
+  <script>
+    var currentQuestion = 1;
+    var totalQuestions = 5;
+    var timeLeft = 900; // 15 minutes
+    var timer;
+    var username = "";
 
-<script>
-// 15 question database
-const allQuestions = [
-  { question: "What is the capital of France?", options: ["Paris", "Rome", "Berlin", "London"], answer: "Paris" },
-  { question: "HTML stands for?", options: ["HyperText Markup Language", "Home Tool Markup Language", "Hyperlinks and Text Markup Language", "None"], answer: "HyperText Markup Language" },
-  { question: "CSS stands for?", options: ["Colorful Style Sheets", "Cascading Style Sheets", "Computer Style Sheets", "Creative Style Sheets"], answer: "Cascading Style Sheets" },
-  { question: "JS stands for?", options: ["Java Style", "JavaScript", "JustScript", "JollyScript"], answer: "JavaScript" },
-  { question: "Which is not a JavaScript Framework?", options: ["Python Script", "JQuery", "Django", "NodeJS"], answer: "Django" },
-  { question: "Which language runs in a web browser?", options: ["Java", "C", "Python", "JavaScript"], answer: "JavaScript" },
-  { question: "What does DOM stand for?", options: ["Document Object Model", "Display Object Management", "Digital Ordinance Model", "Desktop Oriented Mode"], answer: "Document Object Model" },
-  { question: "What year was JavaScript launched?", options: ["1996", "1995", "1994", "none of the above"], answer: "1995" },
-  { question: "Bootstrap is mainly used for?", options: ["Database", "Design", "Server side scripting", "Machine learning"], answer: "Design" },
-  { question: "Which tag is used for paragraphs in HTML?", options: ["<p>", "<div>", "<section>", "<span>"], answer: "<p>" },
-  { question: "Which tag is used to link CSS?", options: ["<link>", "<script>", "<style>", "<meta>"], answer: "<link>" },
-  { question: "Which CSS property changes text color?", options: ["text-color", "color", "font-color", "background-color"], answer: "color" },
-  { question: "How do you create a function in JS?", options: ["function = myFunction()", "function myFunction()", "function:myFunction()", "def myFunction()"], answer: "function myFunction()" },
-  { question: "Which operator is used to assign a value?", options: ["=", "-", "*", "+"], answer: "=" },
-  { question: "Which keyword declare variables in JS?", options: ["var", "let", "const", "All of the above"], answer: "All of the above" }
-];
+    const answers = {
+      q1: 'b',
+      q2: 'b',
+      q3: 'b',
+      q4: 'a',
+      q5: 'b'
+    };
 
-let questions = [];
-let currentQuestionIndex = 0;
-let score = 0;
-let timer;
-let timeLeft = 900; // 15 minutes in seconds
-
-function startQuiz() {
-  questions = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, 5);
-  currentQuestionIndex = 0;
-  score = 0;
-  document.getElementById('quiz-section').classList.remove('d-none');
-  document.getElementById('result-section').classList.add('d-none');
-  document.getElementById('leaderboard-section').style.display = 'none';
-  showQuestion();
-  startTimer();
-}
-
-function showQuestion() {
-  const question = questions[currentQuestionIndex];
-  const container = document.getElementById('question-container');
-  container.innerHTML = `
-    <h4>${currentQuestionIndex + 1}. ${question.question}</h4>
-    ${question.options.map(opt => `
-      <div class="form-check">
-        <input class="form-check-input" type="radio" name="option" value="${opt}" id="${opt}">
-        <label class="form-check-label" for="${opt}">${opt}</label>
-      </div>
-    `).join('')}
-  `;
-}
-
-document.getElementById('next-btn').addEventListener('click', () => {
-  const selected = document.querySelector('input[name="option"]:checked');
-  if (!selected) {
-    alert('Please select an answer!');
-    return;
-  }
-  if (selected.value === questions[currentQuestionIndex].answer) {
-    score++;
-  }
-  currentQuestionIndex++;
-  if (currentQuestionIndex < questions.length) {
-    showQuestion();
-  } else {
-    document.getElementById('next-btn').classList.add('d-none');
-    document.getElementById('submit-btn').classList.remove('d-none');
-  }
-});
-
-document.getElementById('submit-btn').addEventListener('click', finishQuiz);
-
-function finishQuiz() {
-  clearInterval(timer);
-  document.getElementById('quiz-section').classList.add('d-none');
-  document.getElementById('result-section').classList.remove('d-none');
-  const percentage = ((score / questions.length) * 100).toFixed(2);
-  document.getElementById('score').innerText = `You scored ${score}/${questions.length} (${percentage}%)`;
-  showReview();
-  updateLeaderboard(score, percentage);
-}
-
-function showReview() {
-  const review = questions.map((q, index) => {
-    const isCorrect = document.querySelector(`input[name="option"]:checked[value="${q.answer}"]`) !== null;
-    return `
-      <div class="p-2 mb-2 ${isCorrect ? 'correct' : 'wrong'} rounded">
-        <strong>Q${index + 1}:</strong> ${q.question}<br>
-        <small>Correct Answer: <u>${q.answer}</u></small>
-      </div>
-    `;
-  }).join('');
-  document.getElementById('review-container').innerHTML = review;
-}
-
-function restartQuiz() {
-  document.getElementById('next-btn').classList.remove('d-none');
-  document.getElementById('submit-btn').classList.add('d-none');
-  startQuiz();
-}
-
-function startTimer() {
-  timer = setInterval(() => {
-    timeLeft--;
-    const minutes = Math.floor(timeLeft / 60);
-    const seconds = timeLeft % 60;
-    document.getElementById('timer').innerText = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    if (timeLeft <= 0) {
-      clearInterval(timer);
-      finishQuiz();
+    function updateTimer() {
+      document.getElementById('timer').innerText = `Time Left: ${Math.floor(timeLeft / 60)} minutes ${timeLeft % 60} seconds`;
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        alert("Time's up! Submitting your quiz...");
+        submitQuiz();
+      }
+      timeLeft--;
     }
-  }, 1000);
-}
 
-function updateLeaderboard(score, percentage) {
-  const leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
-  leaderboard.push({ score, percentage, date: new Date().toLocaleString() });
-  leaderboard.sort((a, b) => b.score - a.score);
-  localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
-}
+    function startTimer() {
+      timer = setInterval(updateTimer, 1000);
+    }
 
-function showLeaderboard() {
-  const leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
-  const body = leaderboard.map((entry, index) => `
-    <tr>
-      <td>${index + 1}</td>
-      <td>${entry.score}</td>
-      <td>${entry.percentage}%</td>
-      <td>${entry.date}</td>
-    </tr>
-  `).join('');
-  document.getElementById('leaderboard-body').innerHTML = body;
-  document.getElementById('leaderboard-section').style.display = 'block';
-}
+    function startQuiz() {
+      username = document.getElementById('username').value.trim();
+      if (username === "") {
+        alert("Please enter your name first!");
+        return;
+      }
+      document.getElementById('nameDiv').style.display = "none";
+      showQuestion();
+      startTimer();
+    }
 
-// Start quiz when page loads
-startQuiz();
-</script>
+    function showQuestion() {
+      for (var i = 1; i <= totalQuestions; i++) {
+        document.getElementById('q' + i).classList.remove('active');
+      }
+      document.getElementById('q' + currentQuestion).classList.add('active');
+    }
 
-</body>
-  </html>
-  
+    function lockAnswer() {
+      var form = document.getElementById('quizForm');
+      var selected = form['q' + currentQuestion].value;
+
+      if (!selected) {
+        alert('Please select an answer before submitting.');
+        return;
+      }
+
+      if (currentQuestion < totalQuestions) {
+        currentQuestion++;
+        showQuestion();
+      } else {
+        submitQuiz();
+      }
+    }
+
+    function submitQuiz() {
+      clearInterval(timer);
+
+      var score = 0;
+      var form = document.getElementById('quizForm');
+      var explanations = "";
+
+      for (var i = 1; i <= totalQuestions; i++) {
+        var question = 'q' + i;
+        var userAnswer = form[question].value;
+
+        if (userAnswer === answers[question]) {
+          score++;
+          explanations += `<p class="correct"><strong>Q${i} Correct:</strong> ${getExplanation(question, true)}</p>`;
+        } else {
+          explanations += `<p class="wrong"><strong>Q${i} Wrong:</strong> ${getExplanation(question, false)}</p>`;
+        }
+      }
+
+      var percentage = (score / totalQuestions) * 100;
+
+      document.getElementById('score').innerHTML = `You scored ${score}/${totalQuestions} (${percentage.toFixed(2)}%)`;
+      document.getElementById('explanations').innerHTML = `<div class="explanation">${explanations}</div>`;
+
+      saveToLeaderboard(username, score, percentage);
+      displayLeaderboard();
+
+      document.getElementById('quizForm').style.display = 'none';
+      document.getElementById('timer').style.display = 'none';
+    }
+
+    function getExplanation(question, correct) {
+      const messages = {
+        q1: {
+          correct: "Singleton ensures only one object exists.",
+          wrong: "Singleton ensures a single object exists, not multiple or none."
+        },
+        q2: {
+          correct: "We access it by a static method like getInstance().",
+          wrong: "Calling new many times would create multiple objects."
+        },
+        q3: {
+          correct: "Private constructor prevents outside code from making new objects.",
+          wrong: "Without private constructor, anyone could create multiple instances."
+        },
+        q4: {
+          correct: "Reusability is a key feature of OOP.",
+          wrong: "OOP's primary feature is reusability, not speed or text-based interfaces."
+        },
+        q5: {
+          correct: "Factory Method abstracts object creation logic, ensuring flexibility.",
+          wrong: "Factory
+        
