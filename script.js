@@ -1,243 +1,196 @@
-const questions = [
+const quizQuestions = [
   {
-    question: "What is encapsulation in OOP?",
-    options: [
-      "Binding data and methods together",
-      "Breaking a program into modules",
-      "Hiding code from the user",
-      "Accessing variables globally"
-    ],
-    answer: "Binding data and methods together"
+    question: "Which principle is NOT part of SOLID principles?",
+    options: ["Single Responsibility", "Open/Closed", "Inheritance Reuse", "Dependency Inversion"],
+    answer: 2
   },
   {
-    question: "Which design pattern ensures a class has only one instance?",
-    options: ["Observer", "Singleton", "Factory", "Strategy"],
-    answer: "Singleton"
+    question: "In the Factory Pattern, what gets separated?",
+    options: ["Object creation from usage", "Data from UI", "Inheritance from Composition", "Class from Interface"],
+    answer: 0
   },
   {
-    question: "What is polymorphism?",
-    options: [
-      "Defining multiple classes with the same name",
-      "Taking many forms",
-      "Restricting access to methods",
-      "None of the above"
-    ],
-    answer: "Taking many forms"
+    question: "What is 'Polymorphism' in OOP?",
+    options: ["Changing data types", "Same operation different forms", "Hiding data", "Adding new classes"],
+    answer: 1
   },
   {
-    question: "Factory pattern is used for?",
-    options: ["Object creation", "Memory management", "Thread synchronization", "Logging"],
-    answer: "Object creation"
+    question: "Which pattern ensures a class has only one instance?",
+    options: ["Singleton", "Observer", "Decorator", "Adapter"],
+    answer: 0
   },
   {
-    question: "What is an interface?",
-    options: ["A concrete class", "An abstract class", "A class with only method signatures", "A library"],
-    answer: "A class with only method signatures"
+    question: "What does the Liskov Substitution Principle state?",
+    options: ["Subtypes must be substitutable for base types", "Classes must inherit from multiple classes", "Private methods must stay hidden", "Always override methods"],
+    answer: 0
   },
   {
-    question: "The main principle behind SOLID principles is?",
-    options: ["Code reuse", "Maintainability", "Speed", "Testing"],
-    answer: "Maintainability"
+    question: "Which pattern provides a simplified interface to a complex system?",
+    options: ["Bridge", "Composite", "Facade", "Command"],
+    answer: 2
   },
   {
-    question: "Which pattern provides a simplified interface to a complex subsystem?",
-    options: ["Adapter", "Facade", "Decorator", "Proxy"],
-    answer: "Facade"
+    question: "Encapsulation is about:",
+    options: ["Binding data and methods", "Splitting large classes", "Making methods public", "Copying properties"],
+    answer: 0
   },
   {
-    question: "Which pattern lets objects notify other objects about changes?",
-    options: ["Decorator", "Observer", "Builder", "Command"],
-    answer: "Observer"
+    question: "Strategy pattern is used to:",
+    options: ["Allow interchangeable algorithms", "Force one algorithm", "Hardcode rules", "Manage memory"],
+    answer: 0
   },
   {
-    question: "Composition over inheritance promotes?",
-    options: ["Flexibility", "Tight coupling", "Memory leaks", "Speed"],
-    answer: "Flexibility"
+    question: "Which pattern converts the interface of a class into another interface clients expect?",
+    options: ["Decorator", "Adapter", "Proxy", "Template"],
+    answer: 1
   },
   {
-    question: "In OOP, abstraction is?",
-    options: [
-      "Hiding implementation details",
-      "Creating lots of classes",
-      "Inheritance between classes",
-      "Running multiple threads"
-    ],
-    answer: "Hiding implementation details"
+    question: "Inheritance in OOP means:",
+    options: ["One object controls another", "Classes share properties and methods", "Classes have multiple copies", "Creating multiple databases"],
+    answer: 1
   },
   {
-    question: "Which principle is 'Open for extension, closed for modification'?",
-    options: ["Liskov", "Open/Closed", "Interface Segregation", "Dependency Inversion"],
-    answer: "Open/Closed"
+    question: "Observer Pattern is best for:",
+    options: ["Static UIs", "One-time API calls", "Event-driven programming", "Database migrations"],
+    answer: 2
   },
   {
-    question: "Builder pattern is mainly used to?",
-    options: ["Create complex objects", "Destroy objects", "Monitor objects", "Move objects"],
-    answer: "Create complex objects"
+    question: "Composition over Inheritance means:",
+    options: ["Favoring building blocks over hierarchy", "Using deep class chains", "Avoiding all classes", "Only using interfaces"],
+    answer: 0
   },
   {
-    question: "Strategy pattern is for?",
-    options: ["Changing algorithm behavior at runtime", "Saving memory", "Serializing objects", "Notifying objects"],
-    answer: "Changing algorithm behavior at runtime"
+    question: "Abstract Factory pattern helps in:",
+    options: ["Creating families of related objects", "Hiding database queries", "Encrypting files", "Sorting algorithms"],
+    answer: 0
   },
   {
-    question: "Dependency Injection is a form of?",
-    options: ["Composition", "Inheritance", "Overloading", "Recursion"],
-    answer: "Composition"
+    question: "Which OOP principle is about exposing only necessary parts?",
+    options: ["Polymorphism", "Inheritance", "Abstraction", "Encapsulation"],
+    answer: 2
   },
   {
-    question: "What is the main advantage of Observer pattern?",
-    options: ["Low coupling", "High coupling", "Speed", "Ease of access"],
-    answer: "Low coupling"
+    question: "Prototype pattern is based on:",
+    options: ["Copying existing objects", "Creating new from scratch", "Updating class hierarchies", "Locking database rows"],
+    answer: 0
   }
 ];
 
-// Variables
-let selectedQuestions = [];
-let currentQuestionIndex = 0;
+let currentQuiz = [];
+let currentIndex = 0;
 let score = 0;
-let timer;
-let timeLeft = 900; // 15 minutes = 900 seconds
-let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+let timerInterval;
+let totalTime = 15 * 60; // 15 minutes in seconds
+let leaderboard = [];
 
-// DOM Elements
-const quizContainer = document.getElementById('quizContainer');
-const nextBtn = document.getElementById('nextBtn');
-const submitBtn = document.getElementById('submitBtn');
-const resultContainer = document.getElementById('resultContainer');
-const leaderboardContainer = document.getElementById('leaderboardContainer');
-const viewLeaderboardBtn = document.getElementById('viewLeaderboardBtn');
-const timerBar = document.getElementById('timerBar');
-const timerText = document.getElementById('timerText');
-const themeToggle = document.getElementById('themeToggle');
+const timerInner = document.getElementById('timer-inner');
+const questionElement = document.getElementById('question');
+const optionsElement = document.getElementById('options');
+const submitButton = document.getElementById('submit-btn');
+const reviewSection = document.getElementById('review-section');
+const leaderboardSection = document.getElementById('leaderboard-section');
+const leaderboardTable = document.getElementById('leaderboard');
+const successAlert = document.getElementById('success-alert');
+const quizContainer = document.getElementById('quiz-container');
 
-// Theme Toggle
-themeToggle.addEventListener('click', () => {
-  document.body.classList.toggle('dark-theme');
-  document.body.classList.toggle('light-theme');
+document.getElementById('theme-toggle').addEventListener('click', () => {
+  document.body.classList.toggle('dark');
 });
 
-// Start Quiz
 function startQuiz() {
-  selectedQuestions = questions.sort(() => 0.5 - Math.random()).slice(0, 5);
-  showQuestion();
+  currentQuiz = [...quizQuestions].sort(() => 0.5 - Math.random()).slice(0, 5);
+  currentIndex = 0;
+  score = 0;
+  reviewSection.innerHTML = '';
+  leaderboardSection.classList.add('hidden');
+  successAlert.classList.add('hidden');
+  document.getElementById('submit-confirm').classList.remove('hidden');
+  renderQuestion();
   startTimer();
 }
 
-// Show Question
-function showQuestion() {
-  let q = selectedQuestions[currentQuestionIndex];
-  quizContainer.innerHTML = `
-    <h4>${q.question}</h4>
-    <div class="list-group mt-3">
-      ${q.options.map(opt => `
-        <button class="list-group-item list-group-item-action" onclick="selectAnswer(this, '${opt}')">${opt}</button>
-      `).join('')}
-    </div>
-  `;
+function renderQuestion() {
+  const current = currentQuiz[currentIndex];
+  questionElement.textContent = current.question;
+  optionsElement.innerHTML = '';
+  current.options.forEach((option, idx) => {
+    const btn = document.createElement('button');
+    btn.classList.add('option');
+    btn.textContent = option;
+    btn.addEventListener('click', () => selectAnswer(idx));
+    optionsElement.appendChild(btn);
+  });
 }
 
-// Select Answer
-function selectAnswer(button, selected) {
-  const correct = selectedQuestions[currentQuestionIndex].answer;
-  const allButtons = document.querySelectorAll('.list-group-item');
-
-  allButtons.forEach(btn => {
+function selectAnswer(selected) {
+  const correct = currentQuiz[currentIndex].answer;
+  const optionButtons = document.querySelectorAll('.option');
+  optionButtons.forEach((btn, idx) => {
     btn.disabled = true;
-    if (btn.textContent === correct) btn.classList.add('correct');
-    else if (btn.textContent === selected) btn.classList.add('incorrect');
+    if (idx === correct) {
+      btn.classList.add('correct');
+    }
+    if (idx === selected && idx !== correct) {
+      btn.classList.add('incorrect');
+    }
   });
-
   if (selected === correct) score++;
 }
 
-// Next Question
-nextBtn.addEventListener('click', () => {
-  if (currentQuestionIndex < selectedQuestions.length - 1) {
-    currentQuestionIndex++;
-    showQuestion();
-    if (currentQuestionIndex === selectedQuestions.length - 1) {
-      nextBtn.classList.add('d-none');
-      submitBtn.classList.remove('d-none');
-    }
+submitButton.addEventListener('click', submitQuiz);
+
+function submitQuiz() {
+  const confirmBox = document.getElementById('confirm-submit');
+  if (!confirmBox.checked) {
+    alert('Please confirm before submitting.');
+    return;
   }
-});
+  clearInterval(timerInterval);
+  document.getElementById('submit-confirm').classList.add('hidden');
+  showReview();
+  updateLeaderboard();
+  successAlert.classList.remove('hidden');
+}
 
-// Submit Quiz
-submitBtn.addEventListener('click', () => {
-  clearInterval(timer);
-  showResult();
-});
+function showReview() {
+  reviewSection.innerHTML = '<h3>Review:</h3>';
+  currentQuiz.forEach((q, idx) => {
+    const review = document.createElement('div');
+    review.classList.add('review-question');
+    review.innerHTML = `${idx + 1}. ${q.question} <br> Correct Answer: <span class="review-correct">${q.options[q.answer]}</span>`;
+    reviewSection.appendChild(review);
+  });
+}
 
-// Show Result
-function showResult() {
-  const percentage = Math.round((score / selectedQuestions.length) * 100);
-  resultContainer.classList.remove('d-none');
-  resultContainer.innerHTML = `
-    <h3>Your Score: ${score}/${selectedQuestions.length}</h3>
-    <h4>Percentage: ${percentage}%</h4>
-    <button class="btn btn-primary mt-3" onclick="reviewAnswers()">Review Answers</button>
+function updateLeaderboard() {
+  leaderboard.push({ score: score, percentage: ((score / 5) * 100).toFixed(2) });
+  leaderboardTable.innerHTML = `
+    <tr><th>Score</th><th>Percentage</th></tr>
+    ${leaderboard.map(entry => `<tr><td>${entry.score}</td><td>${entry.percentage}%</td></tr>`).join('')}
   `;
-  saveToLeaderboard(score, percentage);
 }
 
-// Review Answers
-function reviewAnswers() {
-  quizContainer.innerHTML = selectedQuestions.map((q, i) => `
-    <div class="mb-3">
-      <h5>Q${i+1}: ${q.question}</h5>
-      <p><strong>Correct Answer:</strong> ${q.answer}</p>
-    </div>
-  `).join('');
-  nextBtn.classList.add('d-none');
-  submitBtn.classList.add('d-none');
-}
-
-// Start Timer
 function startTimer() {
-  timer = setInterval(() => {
+  clearInterval(timerInterval);
+  let timeLeft = totalTime;
+  timerInner.style.animationDuration = `${totalTime}s`;
+  timerInterval = setInterval(() => {
     timeLeft--;
-    let mins = Math.floor(timeLeft / 60);
-    let secs = timeLeft % 60;
-    timerText.textContent = `${mins}m ${secs}s`;
-    timerBar.style.width = `${(timeLeft/900)*100}%`;
-
     if (timeLeft <= 0) {
-      clearInterval(timer);
-      submitBtn.click();
+      clearInterval(timerInterval);
+      alert('Time\'s up! Submitting quiz.');
+      submitQuiz();
     }
   }, 1000);
 }
 
-// Save Leaderboard
-function saveToLeaderboard(score, percentage) {
-  const username = prompt("Enter your name for the leaderboard:");
-  leaderboard.push({ name: username || 'Anonymous', score, percentage });
-  localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
-}
-
-// View Leaderboard
-viewLeaderboardBtn.addEventListener('click', () => {
-  leaderboardContainer.classList.toggle('d-none');
-  renderLeaderboard();
+// Show leaderboard button
+document.getElementById('show-leaderboard').addEventListener('click', () => {
+  leaderboardSection.classList.toggle('hidden');
 });
 
-// Render Leaderboard
-function renderLeaderboard() {
-  leaderboardContainer.innerHTML = `
-    <h4>Leaderboard</h4>
-    <table class="table table-striped">
-      <thead>
-        <tr><th>Name</th><th>Score</th><th>Percentage</th></tr>
-      </thead>
-      <tbody>
-        ${leaderboard.sort((a,b) => b.percentage - a.percentage).map(entry => `
-          <tr><td>${entry.name}</td><td>${entry.score}</td><td>${entry.percentage}%</td></tr>
-        `).join('')}
-      </tbody>
-    </table>
-  `;
-}
+// Retake button
+document.getElementById('retake-btn').addEventListener('click', startQuiz);
 
-// Initialize
 startQuiz();
       
