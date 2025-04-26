@@ -1,0 +1,44 @@
+body.light-theme {
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+body.dark-theme {
+  background-color: #212529;
+  color: #f8f9fa;
+}
+
+.card {
+  border-radius: 1rem;
+}
+
+.progress {
+  height: 20px;
+  background-color: #e9ecef;
+}
+
+#timerText {
+  font-size: 0.9rem;
+}
+
+.btn {
+  border-radius: 30px;
+  padding: 10px 20px;
+}
+
+#quizContainer {
+  min-height: 150px;
+}
+
+#resultContainer {
+  text-align: center;
+}
+
+.correct {
+  background-color: #d4edda;
+}
+
+.incorrect {
+  background-color: #f8d7da;
+}
+
